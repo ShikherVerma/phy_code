@@ -109,6 +109,7 @@ def show_plot():
     global s_energy, plot, axes
     if is_potential_eigen():
         plot, = pl.plot(xaxis, psi_u_array, '-x')
+        pl.plot(xaxis, np.zeros(BOX_TOTAL_DIVISION_CONSTANT+1), '-')
         # reposition plot for adding space for sliders
         pl.subplots_adjust(bottom=0.25)
         # axis labels and title
@@ -117,12 +118,12 @@ def show_plot():
         pl.title('Potential type: particle in a box')
         # marking in plot
         pl.grid(True)
-        pl.xticks(np.arange(min(xaxis), max(xaxis)+1, 5))
-        pl.yticks(np.arange(-abs(min(psi_u_array))-1, abs(max(psi_u_array))+1, 1))
+        pl.xticks(np.arange(min(xaxis), max(xaxis), 5))
+        pl.yticks(np.arange(min(psi_u_array), max(psi_u_array), 1))
         axes = pl.gca()
         # show slider for E
         ax_energy = pl.axes([0.25, 0.1, 0.65, 0.03], axisbg='lightgoldenrodyellow')
-        default_energy_value = 50
+        default_energy_value = 0.0e0
         s_energy = Slider(ax_energy, 'Energy', 0.0, 100.0, valinit=default_energy_value)
         s_energy.on_changed(update)
         # show reset button
@@ -140,10 +141,10 @@ def update(val):
     print_summary()
     calculate_psi()
     plot.set_ydata(psi_u_array)
+    axes.xaxis.set_ticks(np.arange(min(xaxis), max(xaxis), 5))
+    axes.yaxis.set_ticks(np.arange(min(psi_u_array), max(psi_u_array), 1))
     axes.relim()
     axes.autoscale_view(True, True, True)
-    axes.xaxis.set_ticks(np.arange(min(xaxis), max(xaxis)+1, 5))
-    axes.yaxis.set_ticks(np.arange(min(psi_u_array)-1, max(psi_u_array)+1, 1))
     pl.draw()
 
 
