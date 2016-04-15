@@ -4,7 +4,7 @@
 #              Time-Domain (FDTD) Method
 #
 #      This script simulates a probability wave in the presence of multiple
-#      potentials.  The simulation is c arried out by using the FDTD algorithm
+#      potentials.  The simulation is carried out by using the FDTD algorithm
 #      applied to the Schrodinger equation.  The program is intended to act as
 #      a demonstration of the FDTD algorithm and can be used as an educational
 #      aid for quantum mechanics and numerical methods.  The simulation
@@ -14,7 +14,7 @@
 #      NOTES
 #
 #      The probability density plots are amplified by a factor for visual
-#      purposes.  The psi_p quanity contains the actual probability density
+#      purposes.  The psi_p quantity contains the actual probability density
 #      without any rescaling.
 #
 #      BEWARE: The time step,  dt,  has strict requirements or else the
