@@ -1,22 +1,3 @@
-# =============================================================================
-#
-#              Quantum Simulation using Finite Difference Method
-#
-#      The simulation is carried out by using the FD algorithm applied
-#      to the Schroedinger equation.  The program is intended to act as
-#      a demonstration of the FD algorithm and can be used as an educational
-#      aid for quantum mechanics and numerical methods.  The simulation
-#      parameters are defined in the code constants and can be freely
-#      manipulated to see different behaviors.
-#
-#      The code has three built-in potential functions for demonstration.
-#
-#      1) Potential Well
-#      2) Harmonic Oscillator
-#      3) Delta function
-#
-#       Author:  Shikher Verma <root@shikherverma.com>
-#       Date:  15/04/2016
 # ============================================================================
 # Numerical and plotting libraries
 import numpy as np
@@ -142,7 +123,8 @@ def update(val):
     calculate_psi()
     plot.set_ydata(psi_u_array)
     axes.xaxis.set_ticks(np.arange(min(xaxis), max(xaxis), 5))
-    axes.yaxis.set_ticks(np.arange(min(psi_u_array), max(psi_u_array), 1))
+    y_scale = abs(max(psi_u_array) - min(psi_u_array))/4
+    axes.yaxis.set_ticks(np.arange(min(psi_u_array), max(psi_u_array), min(y_scale, 1)))
     axes.relim()
     axes.autoscale_view(True, True, True)
     pl.draw()
