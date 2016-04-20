@@ -9,9 +9,10 @@ manipulated to see different behaviors.
 
 The code has three built-in potential functions for demonstration.
 
-1) Potential Well  
-2) Harmonic Oscillator  
-3) Delta function  
+1. Potential Well / Particle in a Box  
+2. 1D arbitary potential  
+3. 1D symetric potential  
+4. 3D spherically symmetric  
 
 Author:  Shikher Verma <root@shikherverma.com>
 Date:  15/04/2016

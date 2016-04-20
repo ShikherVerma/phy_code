@@ -25,10 +25,10 @@ BOX_PSI_uL_ddu_CONSTANT = -1  # value of derivative of wave function for last di
 # Often, the elements of an array are originally unknown, but its size is known.
 # Hence, NumPy offers several functions to create arrays with initial placeholder content.
 # These minimize the necessity of growing arrays, an expensive operation.
-psi_u_array = np.zeros(BOX_TOTAL_DIVISION_CONSTANT+1)
+psi_u_array = np.zeros(BOX_TOTAL_DIVISION_CONSTANT + 1)
 energy_eigen_values = []
 # variables shared across gui callbacks, hence made global
-xaxis = np.arange(0.0, BOX_TOTAL_DIVISION_CONSTANT+1, 1)
+xaxis = np.arange(0.0, BOX_TOTAL_DIVISION_CONSTANT + 1, 1)
 plot = None
 s_energy = None
 axes = None
@@ -41,7 +41,7 @@ def get_potential_particle_in_box(position):
     if (position < BOX_STARTING_POSITION or position > BOX_LENGTH_CONSTANT):
         return BOX_MAX_POTENTIAL_CONSTANT
     elif (position == BOX_STARTING_POSITION or position == BOX_LENGTH_CONSTANT):
-        return BOX_MAX_POTENTIAL_CONSTANT/2
+        return BOX_MAX_POTENTIAL_CONSTANT / 2
     else:
         return 0
 
@@ -52,7 +52,7 @@ def get_position(current_division):
 
 
 def get_dx():
-    return (BOX_LENGTH_CONSTANT/BOX_TOTAL_DIVISION_CONSTANT)
+    return (BOX_LENGTH_CONSTANT / BOX_TOTAL_DIVISION_CONSTANT)
 
 
 def print_summary():
@@ -78,7 +78,7 @@ def calculate_psi(assumed_energy):
     psi_u_d2du2 = 0
     xaxis_cut_number = 0
     # runs for one extra because we are storing the value in the beginning
-    for current_spatial_division in range(0, BOX_TOTAL_DIVISION_CONSTANT+1):
+    for current_spatial_division in range(0, BOX_TOTAL_DIVISION_CONSTANT + 1):
         psi_u_array[current_spatial_division] = psi_u
         potential = get_potential_particle_in_box(get_position(current_spatial_division))
         psi_u_d2du2 = (potential - assumed_energy) * psi_u
@@ -91,7 +91,7 @@ def calculate_psi(assumed_energy):
 
 def calculate_eigen_psi(lower_limit, upper_limit, interval_size):
     global energy_eigen_values
-    if (lower_limit >= upper_limit or upper_limit-lower_limit <= interval_size):
+    if (lower_limit >= upper_limit or upper_limit - lower_limit <= interval_size):
         return False
     iteration_size = (upper_limit - lower_limit) / interval_size
     index = 0
@@ -108,7 +108,7 @@ def calculate_eigen_psi(lower_limit, upper_limit, interval_size):
 def show_plot():
     global s_energy, plot, axes
     plot, = pl.plot(xaxis, psi_u_array, '-')
-    pl.plot(xaxis, np.zeros(BOX_TOTAL_DIVISION_CONSTANT+1), '-')
+    pl.plot(xaxis, np.zeros(BOX_TOTAL_DIVISION_CONSTANT + 1), '-')
     # reposition plot for adding space for sliders
     pl.subplots_adjust(bottom=0.25)
     # axis labels and title
@@ -118,7 +118,7 @@ def show_plot():
     # marking in plot
     pl.grid(True)
     x_scale = BOX_TOTAL_DIVISION_CONSTANT / 10
-    y_scale = abs(max(psi_u_array) - min(psi_u_array))/4
+    y_scale = abs(max(psi_u_array) - min(psi_u_array)) / 4
     pl.xticks(np.arange(min(xaxis), max(xaxis), x_scale))
     pl.yticks(np.arange(min(psi_u_array), max(psi_u_array), min(y_scale, 1)))
     axes = pl.gca()
@@ -152,7 +152,7 @@ def updateOnClick(val):
     plot.set_ydata(psi_u_array)
     x_scale = BOX_TOTAL_DIVISION_CONSTANT / 10
     axes.xaxis.set_ticks(np.arange(min(xaxis), max(xaxis), x_scale))
-    y_scale = abs(max(psi_u_array) - min(psi_u_array))/4
+    y_scale = abs(max(psi_u_array) - min(psi_u_array)) / 4
     axes.yaxis.set_ticks(np.arange(min(psi_u_array), max(psi_u_array), min(y_scale, 1)))
     axes.relim()
     axes.autoscale_view(True, True, True)
@@ -176,7 +176,7 @@ def prevOnClick(event):
 
 def nextOnClick(event):
     global displayed_energy_eigen_index
-    if displayed_energy_eigen_index == len(energy_eigen_values)-1:
+    if displayed_energy_eigen_index == len(energy_eigen_values) - 1:
         return  # as there is no next
     displayed_energy_eigen_index = displayed_energy_eigen_index + 1
     s_energy.set_val(energy_eigen_values[displayed_energy_eigen_index])
