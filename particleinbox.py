@@ -16,7 +16,6 @@ BOX_TOTAL_DIVISION_CONSTANT = 1000  # number of spatial points to divide the box
 BOX_PSI_u0_CONSTANT = 0  # value of wave function for 0th division
 BOX_PSI_u0_ddu_CONSTANT = 1  # value of derivative of wave function for 0th division
 BOX_PSI_uL_CONSTANT = 0  # value of wave function for last division
-BOX_PSI_uL_ddu_CONSTANT = -1  # value of derivative of wave function for last division
 # Variables for particle in a box potential
 # current_spatial_division; for short names it is referred to as 'u' in other related variable
 # psi_u; wave function as a function of u; pronounce psi of u
@@ -40,8 +39,6 @@ def get_potential_particle_in_box(position):
     "returns potential at a position for particle in a box"
     if (position < BOX_STARTING_POSITION or position > BOX_LENGTH_CONSTANT):
         return BOX_MAX_POTENTIAL_CONSTANT
-    elif (position == BOX_STARTING_POSITION or position == BOX_LENGTH_CONSTANT):
-        return BOX_MAX_POTENTIAL_CONSTANT / 2
     else:
         return 0
 
@@ -62,7 +59,6 @@ def print_summary():
     print "Wave function (psi) at 0: ", BOX_PSI_u0_CONSTANT
     print "Wave function at L", BOX_PSI_uL_CONSTANT
     print "Derivative of Wave function at 0: ", BOX_PSI_u0_ddu_CONSTANT
-    print "Derivative of Wave function at L", BOX_PSI_uL_ddu_CONSTANT
     print 'Potential height: ', BOX_MAX_POTENTIAL_CONSTANT
     print "Box Length: ", BOX_LENGTH_CONSTANT
     print "Box starting coordinate", BOX_STARTING_POSITION
@@ -79,12 +75,14 @@ def calculate_psi(assumed_energy):
     xaxis_cut_number = 0
     # runs for one extra because we are storing the value in the beginning
     for current_spatial_division in range(0, BOX_TOTAL_DIVISION_CONSTANT + 1):
-        psi_u_array[current_spatial_division] = psi_u
+        psi_u_array[current_spatial_division] = psi_u  # storing psi of current division
         potential = get_potential_particle_in_box(get_position(current_spatial_division))
-        psi_u_d2du2 = (potential - assumed_energy) * psi_u
-        psi_u_ddu = psi_u_ddu + psi_u_d2du2 * get_dx()
-        psi_u = psi_u + psi_u_ddu * get_dx()
+        psi_u = psi_u + psi_u_ddu * get_dx()  # psi at next division
+        psi_u_d2du2 = (potential - assumed_energy) * psi_u  # psi by du2 at current division
+        psi_u_ddu = psi_u_ddu + psi_u_d2du2 * get_dx()  # psi by du at next division
         if (psi_u_array[current_spatial_division] * psi_u < 0):
+            xaxis_cut_number += 1
+        if (psi_u_array[current_spatial_division] == 0):
             xaxis_cut_number += 1
     return xaxis_cut_number
 
@@ -95,7 +93,7 @@ def calculate_eigen_psi(lower_limit, upper_limit, interval_size):
         return False
     iteration_size = (upper_limit - lower_limit) / interval_size
     index = 0
-    prev_xaxis_cuts = 0
+    prev_xaxis_cuts = 1
     while index < iteration_size:
         assumed_energy = lower_limit + index * interval_size
         if calculate_psi(assumed_energy) > prev_xaxis_cuts:
@@ -125,7 +123,7 @@ def show_plot():
     # show slider for E
     ax_energy = pl.axes([0.25, 0.1, 0.65, 0.03], axisbg='lightgoldenrodyellow')
     default_energy_value = 0.0e0
-    s_energy = Slider(ax_energy, 'Energy', 0.0, 1000.0, valinit=default_energy_value)
+    s_energy = Slider(ax_energy, 'Energy', 0.0, 100.0, valinit=default_energy_value)
     s_energy.on_changed(updateOnClick)
     # show reset button
     resetax = pl.axes([0.5, 0.025, 0.1, 0.04])
@@ -147,7 +145,6 @@ def updateOnClick(val):
     global plot
     print "new value", s_energy.val
     assumed_energy = s_energy.val
-    print_summary()
     calculate_psi(assumed_energy)
     plot.set_ydata(psi_u_array)
     x_scale = BOX_TOTAL_DIVISION_CONSTANT / 10
@@ -162,7 +159,6 @@ def updateOnClick(val):
 def resetOnClick(event):
     global s_energy
     s_energy.set_val(energy_eigen_values[displayed_energy_eigen_index])
-    print "reset clicked"
 
 
 def prevOnClick(event):
@@ -171,7 +167,6 @@ def prevOnClick(event):
         return  # as there is no prev
     displayed_energy_eigen_index = displayed_energy_eigen_index - 1
     s_energy.set_val(energy_eigen_values[displayed_energy_eigen_index])
-    print "reset clicked"
 
 
 def nextOnClick(event):
@@ -180,14 +175,13 @@ def nextOnClick(event):
         return  # as there is no next
     displayed_energy_eigen_index = displayed_energy_eigen_index + 1
     s_energy.set_val(energy_eigen_values[displayed_energy_eigen_index])
-    print "reset clicked"
 
 
 def main():
     global displayed_energy_eigen_index
     print_summary()
     energy_lower_limit = 0
-    energy_upper_limit = 1000
+    energy_upper_limit = 100
     energy_interval = 0.1
     calculate_eigen_psi(energy_lower_limit, energy_upper_limit, energy_interval)
     if len(energy_eigen_values) != 0:
