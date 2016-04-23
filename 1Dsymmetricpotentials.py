@@ -56,7 +56,7 @@ def calculate_psi(assumed_energy, isEvenSolution):
                 psi_u_array[len(xaxis) - index - 1] = - psi_u
         current_division = xaxis[index]
         if (abs(psi_u) < 20):  # if psi is greater than 20 then it is most likely not going to diverge, so stop lengthy calculations
-            potential = get_symmertric_potential(get_position(current_division))
+            potential = get_symmertric_potential(get_position(current_division))  # - 2*r*R_dr
             psi_u_d2du2 = (potential - assumed_energy) * psi_u  # psi by du2 at current division
             psi_u_ddu = psi_u_ddu + psi_u_d2du2 * dx  # psi by du at next division
             psi_u = psi_u + psi_u_ddu * dx  # psi at next division Using backward eular method
