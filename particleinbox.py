@@ -77,9 +77,9 @@ def calculate_psi(assumed_energy):
     for current_spatial_division in range(0, BOX_TOTAL_DIVISION_CONSTANT + 1):
         psi_u_array[current_spatial_division] = psi_u  # storing psi of current division
         potential = get_potential_particle_in_box(get_position(current_spatial_division))
-        psi_u = psi_u + psi_u_ddu * get_dx()  # psi at next division
         psi_u_d2du2 = (potential - assumed_energy) * psi_u  # psi by du2 at current division
         psi_u_ddu = psi_u_ddu + psi_u_d2du2 * get_dx()  # psi by du at next division
+        psi_u = psi_u + psi_u_ddu * get_dx()  # psi at next division Using backward eular method
         if (psi_u_array[current_spatial_division] * psi_u < 0):
             xaxis_cut_number += 1
         if (psi_u_array[current_spatial_division] == 0):
@@ -186,7 +186,6 @@ def main():
     calculate_eigen_psi(energy_lower_limit, energy_upper_limit, energy_interval)
     if len(energy_eigen_values) != 0:
         calculate_psi(energy_eigen_values[displayed_energy_eigen_index])
-        displayed_energy_eigen_index = 0
         show_plot()
         s_energy.set_val(energy_eigen_values[displayed_energy_eigen_index])
     print "Good bye!"
