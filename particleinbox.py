@@ -2,6 +2,7 @@
 # Numerical and plotting libraries
 import numpy as np
 import pylab as pl
+import math
 from matplotlib.widgets import Slider, Button
 # =============================================================================
 #
@@ -11,8 +12,8 @@ from matplotlib.widgets import Slider, Button
 # Constants for particle in a box potential
 BOX_MAX_POTENTIAL_CONSTANT = 500000.0e0  # v_constant is the potential outside box
 BOX_STARTING_POSITION = 0.0e0  # starting position of box
-BOX_LENGTH_CONSTANT = 2.0e0  # length of the box
-BOX_TOTAL_DIVISION_CONSTANT = 1000  # number of spatial points to divide the box length into
+BOX_LENGTH_CONSTANT = 1.0e0  # length of the box
+BOX_TOTAL_DIVISION_CONSTANT = 10000  # number of spatial points to divide the box length into
 BOX_PSI_u0_CONSTANT = 0  # value of wave function for 0th division
 BOX_PSI_u0_ddu_CONSTANT = 1  # value of derivative of wave function for 0th division
 BOX_PSI_uL_CONSTANT = 0  # value of wave function for last division
@@ -40,7 +41,7 @@ def get_potential_particle_in_box(position):
     if (position < BOX_STARTING_POSITION or position > BOX_LENGTH_CONSTANT):
         return BOX_MAX_POTENTIAL_CONSTANT
     else:
-        return 0
+        return math.sqrt(0.25 - pow(position - 0.5, 2))
 
 
 def get_position(current_division):
@@ -65,6 +66,22 @@ def print_summary():
     print "total divisions to use while calculating", BOX_TOTAL_DIVISION_CONSTANT
 
 
+def calculate_expectation(assumed_energy):
+    sq_sum = 0
+    for current_spatial_division in range(0, BOX_TOTAL_DIVISION_CONSTANT + 1):
+        psi_u = psi_u_array[current_spatial_division]
+        sq_sum = sq_sum + (pow(psi_u, 2) * get_dx())
+    print "normalization constant", sq_sum
+    expectation = 0
+    for current_spatial_division in range(0, BOX_TOTAL_DIVISION_CONSTANT + 1):
+        psi_u = psi_u_array[current_spatial_division]
+        potential = get_potential_particle_in_box(get_position(current_spatial_division))
+        psi_u_d2du2 = (potential - assumed_energy) * psi_u / 2  # psi by du2 at current division
+        expectation = expectation + (psi_u * psi_u_d2du2 * get_dx())
+    expectation = expectation / (-sq_sum * sq_sum)
+    print "Expectation of p2 ", expectation
+
+
 def calculate_psi(assumed_energy):
     "calculate psi values at all spacial points for current energy and"
     "returns number of times xaxis is cut"
@@ -77,7 +94,7 @@ def calculate_psi(assumed_energy):
     for current_spatial_division in range(0, BOX_TOTAL_DIVISION_CONSTANT + 1):
         psi_u_array[current_spatial_division] = psi_u  # storing psi of current division
         potential = get_potential_particle_in_box(get_position(current_spatial_division))
-        psi_u_d2du2 = (potential - assumed_energy) * psi_u  # psi by du2 at current division
+        psi_u_d2du2 = (potential - assumed_energy) * psi_u / 2  # psi by du2 at current division
         psi_u_ddu = psi_u_ddu + psi_u_d2du2 * get_dx()  # psi by du at next division
         psi_u = psi_u + psi_u_ddu * get_dx()  # psi at next division Using backward eular method
         if (psi_u_array[current_spatial_division] * psi_u < 0):
@@ -96,6 +113,7 @@ def calculate_eigen_psi(lower_limit, upper_limit, interval_size):
     prev_xaxis_cuts = 1
     while index < iteration_size:
         assumed_energy = lower_limit + index * interval_size
+        print assumed_energy
         if calculate_psi(assumed_energy) > prev_xaxis_cuts:
             energy_eigen_values.append(round(assumed_energy, 4))
             prev_xaxis_cuts += 1
@@ -106,7 +124,11 @@ def calculate_eigen_psi(lower_limit, upper_limit, interval_size):
 def show_plot():
     global s_energy, plot, axes
     plot, = pl.plot(xaxis, psi_u_array, '-')
-    pl.plot(xaxis, np.zeros(BOX_TOTAL_DIVISION_CONSTANT + 1), '-')
+    pl.plot(xaxis, np.zeros(BOX_TOTAL_DIVISION_CONSTANT + 1), '.-')
+    potential = []
+    for current_division in range(0, len(xaxis)):
+        potential.append(get_potential_particle_in_box(get_position(xaxis[current_division])))
+    pl.plot(xaxis, potential, '-')
     # reposition plot for adding space for sliders
     pl.subplots_adjust(bottom=0.25)
     # axis labels and title
@@ -154,6 +176,7 @@ def updateOnClick(val):
     axes.relim()
     axes.autoscale_view(True, True, True)
     pl.draw()
+    calculate_expectation(assumed_energy)
 
 
 def resetOnClick(event):
@@ -180,14 +203,16 @@ def nextOnClick(event):
 def main():
     global displayed_energy_eigen_index
     print_summary()
-    energy_lower_limit = 0
-    energy_upper_limit = 100
-    energy_interval = 0.1
+    energy_lower_limit = 19.5
+    energy_upper_limit = 20.5
+    energy_interval = 0.001
     calculate_eigen_psi(energy_lower_limit, energy_upper_limit, energy_interval)
     if len(energy_eigen_values) != 0:
         calculate_psi(energy_eigen_values[displayed_energy_eigen_index])
         show_plot()
         s_energy.set_val(energy_eigen_values[displayed_energy_eigen_index])
+    else:
+        show_plot()
     print "Good bye!"
 
 main()  # start main function
