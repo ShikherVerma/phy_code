@@ -16,3 +16,4 @@ The code has three built-in potential functions for demonstration.
 
 Author:  Shikher Verma <root@shikherverma.com>
 Date:  15/04/2016
+Course: PSO201 Introduction to Quantum Physics
